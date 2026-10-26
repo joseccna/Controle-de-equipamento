@@ -27,6 +27,7 @@ export default function ManutencoesScreen() {
     if (params.situacao) {
       setSituacao(params.situacao);
       setMostrarFiltros(true);
+      router.setParams({ situacao: '' }); // permite aplicar o mesmo filtro de novo depois
     }
   }, [params.situacao]);
 

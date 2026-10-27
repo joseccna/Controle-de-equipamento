@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
-import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import equipamentoRepository from '../../repositories/EquipamentoRepository';
 import CampoTexto from '../../components/CampoTexto';
@@ -9,25 +9,16 @@ import ControleOrdenacao from '../../components/ControleOrdenacao';
 import { Badge, BotaoFlutuante, Cartao, EstadoVazio } from '../../components/Basicos';
 import { CATEGORIAS, ORDENACAO_EQUIPAMENTOS, STATUS_EQUIPAMENTO } from '../../utils/constantes';
 import { mostrarErro } from '../../utils/alertas';
+import { consumirFiltroPendente } from '../../utils/filtroPendente';
 import { cores, coresStatus } from '../../utils/tema';
 
 export default function EquipamentosScreen() {
-  const params = useLocalSearchParams();
   const [busca, setBusca] = useState('');
   const [status, setStatus] = useState(null);
   const [categoria, setCategoria] = useState(null);
   const [ordenacao, setOrdenacao] = useState({ ordenarPor: 'nome', crescente: true });
   const [mostrarFiltros, setMostrarFiltros] = useState(false);
   const [equipamentos, setEquipamentos] = useState([]);
-
-  // O painel pode abrir esta tela já filtrada por status ("todos" limpa o filtro).
-  useEffect(() => {
-    if (!params.status) return;
-    const filtro = params.status === 'todos' ? null : params.status;
-    setStatus(filtro);
-    if (filtro) setMostrarFiltros(true);
-    router.setParams({ status: '' }); // permite aplicar o mesmo filtro de novo depois
-  }, [params.status]);
 
   // Cada mudança de filtro gera uma nova consulta SQL com WHERE e ORDER BY.
   const carregar = useCallback(async () => {
@@ -38,10 +29,20 @@ export default function EquipamentosScreen() {
     }
   }, [busca, status, categoria, ordenacao]);
 
+  // Ao ganhar foco, aplica o filtro vindo do Painel (se houver). Se ele mudar o
+  // status, o carregar muda junto e este efeito roda de novo com o filtro novo.
   useFocusEffect(
     useCallback(() => {
+      const filtro = consumirFiltroPendente('equipamentos');
+      if (filtro !== undefined) {
+        setMostrarFiltros(filtro !== null);
+        if (filtro !== status) {
+          setStatus(filtro);
+          return;
+        }
+      }
       carregar();
-    }, [carregar]),
+    }, [carregar, status]),
   );
 
   const filtrosAtivos = [status, categoria].filter(Boolean).length;

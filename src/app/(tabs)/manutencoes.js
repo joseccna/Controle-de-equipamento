@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
-import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import manutencaoRepository from '../../repositories/ManutencaoRepository';
 import CampoTexto from '../../components/CampoTexto';
@@ -10,26 +10,17 @@ import CartaoManutencao from '../../components/CartaoManutencao';
 import { BotaoFlutuante, EstadoVazio } from '../../components/Basicos';
 import { ORDENACAO_MANUTENCOES, SITUACOES_MANUTENCAO, TIPOS_MANUTENCAO } from '../../utils/constantes';
 import { mostrarErro } from '../../utils/alertas';
+import { consumirFiltroPendente } from '../../utils/filtroPendente';
 import { formatarMoeda } from '../../utils/numeros';
 import { cores } from '../../utils/tema';
 
 export default function ManutencoesScreen() {
-  const params = useLocalSearchParams();
   const [busca, setBusca] = useState('');
   const [situacao, setSituacao] = useState(null);
   const [tipo, setTipo] = useState(null);
   const [ordenacao, setOrdenacao] = useState({ ordenarPor: 'abertura', crescente: false });
   const [mostrarFiltros, setMostrarFiltros] = useState(false);
   const [manutencoes, setManutencoes] = useState([]);
-
-  // O painel pode abrir esta tela já filtrada (ex.: só as atrasadas).
-  useEffect(() => {
-    if (params.situacao) {
-      setSituacao(params.situacao);
-      setMostrarFiltros(true);
-      router.setParams({ situacao: '' }); // permite aplicar o mesmo filtro de novo depois
-    }
-  }, [params.situacao]);
 
   const carregar = useCallback(async () => {
     try {
@@ -39,10 +30,19 @@ export default function ManutencoesScreen() {
     }
   }, [busca, situacao, tipo, ordenacao]);
 
+  // Ao ganhar foco, aplica o filtro vindo do Painel (ex.: só as atrasadas).
   useFocusEffect(
     useCallback(() => {
+      const filtro = consumirFiltroPendente('manutencoes');
+      if (filtro !== undefined) {
+        setMostrarFiltros(filtro !== null);
+        if (filtro !== situacao) {
+          setSituacao(filtro);
+          return;
+        }
+      }
       carregar();
-    }, [carregar]),
+    }, [carregar, situacao]),
   );
 
   const filtrosAtivos = [situacao, tipo].filter(Boolean).length;

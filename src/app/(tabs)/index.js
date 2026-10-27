@@ -8,6 +8,7 @@ import CartaoManutencao from '../../components/CartaoManutencao';
 import Botao from '../../components/Botao';
 import { EstadoVazio, TituloSecao } from '../../components/Basicos';
 import { mostrarErro } from '../../utils/alertas';
+import { definirFiltroPendente } from '../../utils/filtroPendente';
 import { formatarMoeda } from '../../utils/numeros';
 import { cores } from '../../utils/tema';
 
@@ -21,8 +22,16 @@ function Indicador({ titulo, valor, icone, cor, onPress }) {
   );
 }
 
-const verEquipamentos = (status) => router.navigate({ pathname: '/equipamentos', params: { status } });
-const verManutencoes =(situacao) => router.navigate({ pathname: '/manutencoes', params: { situacao } });
+// null = sem filtro (mostrar todos).
+function verEquipamentos(status) {
+  definirFiltroPendente('equipamentos', status);
+  router.navigate('/equipamentos');
+}
+
+function verManutencoes(situacao) {
+  definirFiltroPendente('manutencoes', situacao);
+  router.navigate('/manutencoes');
+}
 
 export default function PainelScreen() {
   const [dados, setDados] = useState(null);
@@ -76,7 +85,7 @@ export default function PainelScreen() {
       <TituloSecao>Equipamentos</TituloSecao>
       <View style={styles.grade}>
         <Indicador titulo="Total" valor={eq.total} icone="cube-outline" cor={cores.primaria}
-          onPress={() => verEquipamentos('todos')} />
+          onPress={() => verEquipamentos(null)} />
         <Indicador titulo="Ativos" valor={eq.ativos} icone="checkmark-circle-outline" cor={cores.sucesso}
           onPress={() => verEquipamentos('Ativo')} />
         <Indicador titulo="Em manutenção" valor={eq.emManutencao} icone="build-outline" cor={cores.alerta}

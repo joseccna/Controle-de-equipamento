@@ -1,6 +1,6 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
-import { router, useFocusEffect } from 'expo-router';
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import equipamentoRepository from '../../repositories/EquipamentoRepository';
 import CampoTexto from '../../components/CampoTexto';
@@ -12,12 +12,22 @@ import { mostrarErro } from '../../utils/alertas';
 import { cores, coresStatus } from '../../utils/tema';
 
 export default function EquipamentosScreen() {
+  const params = useLocalSearchParams();
   const [busca, setBusca] = useState('');
   const [status, setStatus] = useState(null);
   const [categoria, setCategoria] = useState(null);
   const [ordenacao, setOrdenacao] = useState({ ordenarPor: 'nome', crescente: true });
   const [mostrarFiltros, setMostrarFiltros] = useState(false);
   const [equipamentos, setEquipamentos] = useState([]);
+
+  // O painel pode abrir esta tela já filtrada por status ("todos" limpa o filtro).
+  useEffect(() => {
+    if (!params.status) return;
+    const filtro = params.status === 'todos' ? null : params.status;
+    setStatus(filtro);
+    if (filtro) setMostrarFiltros(true);
+    router.setParams({ status: '' }); // permite aplicar o mesmo filtro de novo depois
+  }, [params.status]);
 
   // Cada mudança de filtro gera uma nova consulta SQL com WHERE e ORDER BY.
   const carregar = useCallback(async () => {

@@ -21,7 +21,8 @@ function Indicador({ titulo, valor, icone, cor, onPress }) {
   );
 }
 
-const verManutencoes = (situacao) => router.navigate({ pathname: '/manutencoes', params: { situacao } });
+const verEquipamentos = (status) => router.navigate({ pathname: '/equipamentos', params: { status } });
+const verManutencoes =(situacao) => router.navigate({ pathname: '/manutencoes', params: { situacao } });
 
 export default function PainelScreen() {
   const [dados, setDados] = useState(null);
@@ -75,13 +76,13 @@ export default function PainelScreen() {
       <TituloSecao>Equipamentos</TituloSecao>
       <View style={styles.grade}>
         <Indicador titulo="Total" valor={eq.total} icone="cube-outline" cor={cores.primaria}
-          onPress={() => router.navigate('/equipamentos')} />
+          onPress={() => verEquipamentos('todos')} />
         <Indicador titulo="Ativos" valor={eq.ativos} icone="checkmark-circle-outline" cor={cores.sucesso}
-          onPress={() => router.navigate('/equipamentos')} />
+          onPress={() => verEquipamentos('Ativo')} />
         <Indicador titulo="Em manutenção" valor={eq.emManutencao} icone="build-outline" cor={cores.alerta}
-          onPress={() => router.navigate('/equipamentos')} />
+          onPress={() => verEquipamentos('Em manutenção')} />
         <Indicador titulo="Inativos" valor={eq.inativos} icone="pause-circle-outline" cor={cores.neutro}
-          onPress={() => router.navigate('/equipamentos')} />
+          onPress={() => verEquipamentos('Inativo')} />
       </View>
 
       <TituloSecao>Manutenções</TituloSecao>

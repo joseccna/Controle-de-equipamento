@@ -56,4 +56,10 @@ src/
 
 ## Capturas de tela
 
-Ficam em [docs/screenshots/](docs/screenshots/).
+| Painel | Próximos serviços | Equipamentos |
+|---|---|---|
+| <img src="docs/screenshots/01-painel.jpg" width="220"> | <img src="docs/screenshots/02-painel-proximos-servicos.jpg" width="220"> | <img src="docs/screenshots/03-lista-equipamentos.jpg" width="220"> |
+| **Novo equipamento** | **Detalhe do equipamento** | **Edição salva** |
+| <img src="docs/screenshots/04-novo-equipamento.jpg" width="220"> | <img src="docs/screenshots/05-detalhe-equipamento.jpg" width="220"> | <img src="docs/screenshots/06-equipamento-atualizado.jpg" width="220"> |
+| **Manutenções** | | |
+| <img src="docs/screenshots/07-lista-manutencoes.jpg" width="220"> | | |
